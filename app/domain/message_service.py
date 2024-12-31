@@ -48,7 +48,7 @@ def transcribe_audio_file(audio_file: BinaryIO) -> str:
     except Exception as e:  
         raise ValueError("Error transcribing audio") from e
 
-# transcribe audio
+# transcribe audio using download and transcribe functions defined above
 def transcribe_audio(audio: Audio) -> str:  
     file_path = download_file_from_facebook(audio.id, "audio", audio.mime_type)  
     with open(file_path, 'rb') as audio_binary:  
@@ -58,3 +58,14 @@ def transcribe_audio(audio: Audio) -> str:
     except Exception as e:  
         print(f"Failed to delete file: {e}")  
     return transcription
+
+# authneticate user by phone number
+def authenticate_user_by_phone_number(phone_number: str) -> User | None:  
+    allowed_users = [  
+        {"id": 1, "phone": "+17818163706", "first_name": "David", "last_name": "Dangond", "role": "default"},  
+        {"id": 2, "phone": "+0987654321", "first_name": "Jane", "last_name": "Smith", "role": "default"}  
+    ]    
+    for user in allowed_users:  
+        if user["phone"] == phone_number:  
+            return User(**user)  
+    return None
