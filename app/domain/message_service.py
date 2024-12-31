@@ -69,3 +69,37 @@ def authenticate_user_by_phone_number(phone_number: str) -> User | None:
         if user["phone"] == phone_number:  
             return User(**user)  
     return None
+
+# send or respoind to a guest
+def send_whatsapp_message(to, message, template=True):  
+    url = f"https://graph.facebook.com/v18.0/289534840903017/messages"  
+    headers = {  
+        "Authorization": f"Bearer " + WHATSAPP_API_KEY,  
+        "Content-Type": "application/json"  
+    }  
+    if not template:  
+        data = {  
+            "messaging_product": "whatsapp",  
+            "preview_url": False,  
+            "recipient_type": "individual",  
+            "to": to,  
+            "type": "text",  
+            "text": {  
+                "body": message  
+            }  
+        }  
+    else:  
+        data = {  
+            "messaging_product": "whatsapp",  
+            "to": to,  
+            "type": "template",  
+            "template": {  
+                "name": "hello_world",  
+                "language": {  
+                    "code": "en_US"  
+                }  
+            }  
+        }  
+
+    response = requests.post(url, headers=headers, data=json.dumps(data))  
+    return response.json()
