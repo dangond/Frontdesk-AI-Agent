@@ -4,6 +4,8 @@ import requests
 from typing import BinaryIO
 from dotenv import load_dotenv
 from openai import OpenAI 
+from app.domain.agents.routing_agent import RoutingAgent  
+from app.schema import User  
 
 load_dotenv()
 
@@ -103,3 +105,9 @@ def send_whatsapp_message(to, message, template=True):
 
     response = requests.post(url, headers=headers, data=json.dumps(data))  
     return response.json()
+
+
+    def respond_and_send_message(user_message: str, user: User):  
+        agent = RoutingAgent()  
+        response = agent.run(user_message, user.id)  
+        send_whatsapp_message(user.phone, response, template=False)
