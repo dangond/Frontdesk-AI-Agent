@@ -48,7 +48,8 @@ def receive_whatsapp(
         raise HTTPException(status_code=401, detail="Unauthorized")  
     if image:  
         return print("Image received (Can't handle images yet.)")  
-    if user_message:  
+    if user_message: 
+        # new thread for async processing 
         thread = threading.Thread(
             target=message_service.respond_and_send_message, 
             args=(user_message, user)
