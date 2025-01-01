@@ -71,7 +71,7 @@ def authenticate_user_by_phone_number(phone_number: str) -> User | None:
 
     allowed_users = [
         {"id": 1, "phone": "17818163706", "first_name": "David", "last_name": "Dangond", "role": "default"},
-        {"id": 2, "phone": "+0987654321", "first_name": "Jane", "last_name": "Smith", "role": "default"}
+        {"id": 2, "phone": "+0987654321", "first_name": "test", "last_name": "test", "role": "default"}
     ]
 
     for user in allowed_users:
@@ -130,4 +130,6 @@ def respond_and_send_message(user_message: str, user: User):
         response = "The restaurant opens at 11:00 AM"
     elif user_message == "can I get towels up to my room ASAP?":
         response = "Yes, we can send towels to your room right away."
+    else:
+        response = "I'm sorry, I haven't been trained for that yet."
     send_whatsapp_message(user.phone, response, template=False)
