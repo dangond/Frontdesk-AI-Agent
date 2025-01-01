@@ -1,11 +1,15 @@
 import os  
 import json  
 import requests  
+import logging
 from typing import BinaryIO
 from dotenv import load_dotenv
 from openai import OpenAI 
 # from app.domain.agents.routing_agent import RoutingAgent  
 from app.schema import User, Audio 
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 load_dotenv()
 
@@ -62,19 +66,25 @@ def transcribe_audio(audio: Audio) -> str:
     return transcription
 
 # authneticate user by phone number
-def authenticate_user_by_phone_number(phone_number: str) -> User | None:  
-    allowed_users = [  
-        {"id": 1, "phone": "+17818163706", "first_name": "David", "last_name": "Dangond", "role": "default"},  
-        {"id": 2, "phone": "+0987654321", "first_name": "Jane", "last_name": "Smith", "role": "default"}  
-    ]    
-    for user in allowed_users:  
-        if user["phone"] == phone_number:  
-            return User(**user)  
+def authenticate_user_by_phone_number(phone_number: str) -> User | None:
+    logger.info(f"Attempting to authenticate user with phone number: {phone_number}")
+
+    allowed_users = [
+        {"id": 1, "phone": "17818163706", "first_name": "David", "last_name": "Dangond", "role": "default"},
+        {"id": 2, "phone": "+0987654321", "first_name": "Jane", "last_name": "Smith", "role": "default"}
+    ]
+
+    for user in allowed_users:
+        if user["phone"] == phone_number:
+            logger.info(f"User found: {user['first_name']} {user['last_name']}")
+            return User(**user)
+
+    logger.warning(f"Authentication failed for phone number: {phone_number}")
     return None
 
-# send or respoind to a guest
-def send_whatsapp_message(to, message, template=True):  
-    url = f"https://graph.facebook.com/v18.0/289534840903017/messages"  
+# send or respond to a guest
+def send_whatsapp_message(to, message, template=False):
+    url = f"https://graph.facebook.com/v21.0/504587716075008/messages"  
     headers = {  
         "Authorization": f"Bearer " + WHATSAPP_API_KEY,  
         "Content-Type": "application/json"  
@@ -106,7 +116,18 @@ def send_whatsapp_message(to, message, template=True):
     response = requests.post(url, headers=headers, data=json.dumps(data))  
     return response.json()
 
-# def respond_and_send_message(user_message: str, user: User):  
-#     agent = RoutingAgent()  
-#     response = agent.run(user_message, user.id)  
-#     send_whatsapp_message(user.phone, response, template=False)
+def respond_and_send_message(user_message: str, user: User):  
+    # agent = RoutingAgent()  
+    # response = agent.run(user_message, user.id)  
+    # send_whatsapp_message(user.phone, response, template=False)
+    if user_message == "what time does the spa close?":
+        response = "The spa closes at 7:00 PM"
+    elif user_message == "what time does the spa open?":
+        response = "The spa opens at 9:00 AM"
+    elif user_message == "what time does talons close?":
+        response = "The restaurant closes at 3:30 PM"
+    elif user_message == "what time does talons open?":
+        response = "The restaurant opens at 11:00 AM"
+    elif user_message == "can I get towels up to my room ASAP?":
+        response = "Yes, we can send towels to your room right away."
+    send_whatsapp_message(user.phone, response, template=False)

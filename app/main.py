@@ -1,8 +1,12 @@
 import threading  
+import logging
 from typing_extensions import Annotated  
 from fastapi import FastAPI, APIRouter, Query, HTTPException, Depends  
 from app.domain import message_service
 from app.schema import Payload, Message, Audio, Image, User  
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 VERIFICATION_TOKEN = "sapientdev-ritz-demo"
 
@@ -56,24 +60,39 @@ def message_extractor(
         return message.text.body  
     return None
 
-@app.post("/", status_code=200)  
-def receive_whatsapp(  
+@app.post("/", status_code=200)
+def receive_whatsapp(
         user: Annotated[User, Depends(get_current_user)],  
         user_message: Annotated[str, Depends(message_extractor)],  
-        image: Annotated[Image, Depends(parse_image_file)],  
-):  
-    if not user and not user_message and not image:  
-        return {"status": "ok"}  
-    if not user:  
-        raise HTTPException(status_code=401, detail="Unauthorized")  
-    if image:  
-        return print("Image received (Can't handle images yet.)")  
-    if user_message: 
+        image: Annotated[Image, Depends(parse_image_file)],
+):
+    logger.info("Received request")
+
+    # Log the user, user_message, and image
+    logger.info(f"User: {user}")
+    logger.info(f"User message: {user_message}")
+    logger.info(f"Image: {image}")
+
+    if not user and not user_message and not image:
+        logger.info("No user, message, or image received. Returning 'ok'")
+        return {"status": "ok"}
+
+    if not user:
+        logger.warning("Unauthorized access attempt - user not found")
+        raise HTTPException(status_code=401, detail="Unauthorized")
+
+    if image:
+        logger.info("Image received (Can't handle images yet.)")
+        return print("Image received (Can't handle images yet.)")
+
+    if user_message:
+        logger.info(f"Processing user message: {user_message}")
         # new thread for async processing 
         thread = threading.Thread(
             target=message_service.respond_and_send_message, 
             args=(user_message, user)
         )  
         thread.daemon = True  
-        thread.start()  
+        thread.start()
+
     return {"status": "ok"}
