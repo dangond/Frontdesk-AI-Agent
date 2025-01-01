@@ -67,8 +67,10 @@ uv run uvicorn app.main:app --reload --port 8080
 ```
 
 8. **Create secure tunnel from internet to your local machine using Ngrok:**
-
+- [Create Ngrok account] (https://dashboard.ngrok.com/signup)
+- Get *$YOUR-AUTHENTICATION_TOKEN* which can be found under "Your Authtoken" in the ngrok side navigation
 ``` bash
+uv run ngrok config add-authtoken $YOUR-AUTHENTICATION_TOKEN
 uv run ngrok http http://localhost:8080
 ```
 
