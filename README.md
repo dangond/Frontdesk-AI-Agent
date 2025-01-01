@@ -52,11 +52,11 @@ echo "OPENAI_API_KEY = sk-proj-PPRo_L_dQQyMGSCcXpAmkDF7Lhe6p1fwH3rbAbFHN8g8vWifx
 
 6. **Add your Whatsapp # to our own user whitelist for further authentication:**
 - go to https://github.com/dangond/Frontdesk-AI-Agent/blob/844a1bc4f1c1e55a3a94480742b51048c3baf6d3/app/domain/message_service.py#L73
-- Add an entry for yourself similar to the ones below:
+- Add an entry for yourself similar to the examples:
 ```python
     allowed_users = [
         {"id": 1, "phone": "17818163706", "first_name": "David", "last_name": "Dangond", "role": "default"},
-        {"id": 2, "phone": "+0987654321", "first_name": "test", "last_name": "test", "role": "default"}
+        {"id": 2, "phone": "...", "first_name": "...", "last_name": "...", "role": "..."}
     ]
 ```
 
