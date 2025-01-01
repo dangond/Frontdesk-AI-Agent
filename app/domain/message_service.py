@@ -4,8 +4,8 @@ import requests
 from typing import BinaryIO
 from dotenv import load_dotenv
 from openai import OpenAI 
-from app.domain.agents.routing_agent import RoutingAgent  
-from app.schema import User  
+# from app.domain.agents.routing_agent import RoutingAgent  
+from app.schema import User, Audio 
 
 load_dotenv()
 
@@ -21,20 +21,20 @@ def download_file_from_facebook(file_id: str, file_type: str, mime_type: str) ->
     headers = {"Authorization": f"Bearer {WHATSAPP_API_KEY}"}  
     response = requests.get(url, headers=headers)
     if response.status_code == 200:  
-            download_url = response.json().get('url')  
-            # Second GET request to download the file  
-            response = requests.get(download_url, headers=headers)  
-            if response.status_code == 200:
-                # Extract file extension from mime_type    
-                file_extension = mime_type.split('/')[-1].split(';')[0]
-                # Create file_path with extension
-                file_path = f"{file_id}.{file_extension}"  
-                with open(file_path, 'wb') as file:  
-                    file.write(response.content)  
-                if file_type == "image" or file_type == "audio":  
-                    return file_path  
-            raise ValueError(f"Failed to download file. Status code: {response.status_code}")  
-        raise ValueError(f"Failed to retrieve download URL. Status code: {response.status_code}")
+        download_url = response.json().get('url')  
+        # Second GET request to download the file  
+        response = requests.get(download_url, headers=headers)  
+        if response.status_code == 200:
+            # Extract file extension from mime_type    
+            file_extension = mime_type.split('/')[-1].split(';')[0]
+            # Create file_path with extension
+            file_path = f"{file_id}.{file_extension}"  
+            with open(file_path, 'wb') as file:  
+                file.write(response.content)  
+            if file_type == "image" or file_type == "audio":  
+                return file_path  
+        raise ValueError(f"Failed to download file. Status code: {response.status_code}")  
+    raise ValueError(f"Failed to retrieve download URL. Status code: {response.status_code}")
 
 # transcribe audio using whisper LLM
 def transcribe_audio_file(audio_file: BinaryIO) -> str:  
@@ -106,8 +106,7 @@ def send_whatsapp_message(to, message, template=True):
     response = requests.post(url, headers=headers, data=json.dumps(data))  
     return response.json()
 
-
-    def respond_and_send_message(user_message: str, user: User):  
-        agent = RoutingAgent()  
-        response = agent.run(user_message, user.id)  
-        send_whatsapp_message(user.phone, response, template=False)
+# def respond_and_send_message(user_message: str, user: User):  
+#     agent = RoutingAgent()  
+#     response = agent.run(user_message, user.id)  
+#     send_whatsapp_message(user.phone, response, template=False)
