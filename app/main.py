@@ -86,13 +86,17 @@ def receive_whatsapp(
         return print("Image received (Can't handle images yet.)")
 
     if user_message:
-        logger.info(f"Processing user message: {user_message}")
-        # new thread for async processing 
-        thread = threading.Thread(
-            target=message_service.respond_and_send_message, 
-            args=(user_message, user)
-        )  
-        thread.daemon = True  
-        thread.start()
+        try:
+            logger.info(f"Processing user message: {user_message}")
+            # New thread for async processing 
+            thread = threading.Thread(
+                target=message_service.respond_and_send_message, 
+                args=(user_message, user)
+            )  
+            thread.daemon = True
+            logging.info("Starting a new thread for message processing.")
+            thread.start()
+        except Exception as e:
+            logging.error(f"An error occurred while starting the thread: {str(e)}", exc_info=True)
 
     return {"status": "ok"}
