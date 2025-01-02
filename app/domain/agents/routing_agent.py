@@ -183,7 +183,7 @@ class RoutingAgent:
         # send guest a message letting them know their task has been received.
         reply_task_message = self.assure_guest(task_json)
 
-        return reply_task_message
+        return reply_task_message + '\n\n You can track your request status at this link: https://www.google.com.'
     
 
     

@@ -116,16 +116,27 @@ def send_whatsapp_message(to, message, template=False):
         }
 
     try:
+        # Log the outgoing request details
+        logging.info(f"Sending POST request to {url} with headers: {headers} and data: {json.dumps(data, indent=2)}")
+        
+        # Send the POST request
         response = requests.post(url, headers=headers, data=json.dumps(data))
+        
+        # Log the HTTP response status and body
+        logging.info(f"Response Status Code: {response.status_code}")
+        logging.info(f"Response Body: {response.text}")
+        if response.status_code == 401:
+            logging.error("Authentication error: Please check your API key.")
+        
+        # Parse and return the response JSON
         response_data = response.json()
-
         return response_data
     except Exception as e:
         # Log any exceptions that occur
         logging.error(f"An error occurred: {str(e)}", exc_info=True)
         return {"error": str(e)}
 
-def respond_and_send_message(user_message: str, user: User):  
+def respond_and_send_message(user_message: str, user: User):
     # Create an instance of RoutingAgent
     agent = RoutingAgent(user)
 
