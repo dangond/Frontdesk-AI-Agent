@@ -1,8 +1,15 @@
 # Frontdesk-AI-Agent
-tech:
+## tech
+
+Backend:
 - fastapi
 - uvicorn
 - ngrok
+
+AI Agent:
+- Langgraph (execute tasks)
+- Tavily (web search api)
+- Mistral (LLM: proccess and respond to messages)
 
 
 ---
@@ -100,7 +107,7 @@ Copy the https URL in the Forwarding header and save for the next step. This is 
 ```
 - Should receive a a message to your WhatsApp.
 
-11. DONE: You are ready to communicate with the AI front desk through WhatsApp.
+11. **DONE:** You are ready to communicate with the AI front desk through WhatsApp.
 
 
 **Troubleshooting**

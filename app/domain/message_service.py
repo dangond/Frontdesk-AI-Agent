@@ -5,7 +5,7 @@ import logging
 from typing import BinaryIO
 from dotenv import load_dotenv
 from openai import OpenAI 
-# from app.domain.agents.routing_agent import RoutingAgent  
+from app.domain.agents.routing_agent import RoutingAgent  
 from app.schema import User, Audio 
 
 logging.basicConfig(level=logging.INFO)
@@ -82,54 +82,64 @@ def authenticate_user_by_phone_number(phone_number: str) -> User | None:
     logger.warning(f"Authentication failed for phone number: {phone_number}")
     return None
 
-# send or respond to a guest
+# Send or respond to a guest
 def send_whatsapp_message(to, message, template=False):
-    url = f"https://graph.facebook.com/v21.0/504587716075008/messages"  
-    headers = {  
-        "Authorization": f"Bearer " + WHATSAPP_API_KEY,  
-        "Content-Type": "application/json"  
-    }  
-    if not template:  
-        data = {  
-            "messaging_product": "whatsapp",  
-            "preview_url": False,  
-            "recipient_type": "individual",  
-            "to": to,  
-            "type": "text",  
-            "text": {  
-                "body": message  
-            }  
-        }  
-    else:  
-        data = {  
-            "messaging_product": "whatsapp",  
-            "to": to,  
-            "type": "template",  
-            "template": {  
-                "name": "hello_world",  
-                "language": {  
-                    "code": "en_US"  
-                }  
-            }  
-        }  
+    url = "https://graph.facebook.com/v21.0/504587716075008/messages"
+    headers = {
+        "Authorization": f"Bearer " + WHATSAPP_API_KEY,
+        "Content-Type": "application/json"
+    }
 
-    response = requests.post(url, headers=headers, data=json.dumps(data))  
-    return response.json()
+    if not template:
+        data = {
+            "messaging_product": "whatsapp",
+            "preview_url": False,
+            "recipient_type": "individual",
+            "to": to,
+            "type": "text",
+            "text": {
+                "body": message
+            }
+        }
+    else:
+        data = {
+            "messaging_product": "whatsapp",
+            "to": to,
+            "type": "template",
+            "template": {
+                "name": "hello_world",
+                "language": {
+                    "code": "en_US"
+                }
+            }
+        }
+
+    try:
+        response = requests.post(url, headers=headers, data=json.dumps(data))
+        response_data = response.json()
+
+        return response_data
+    except Exception as e:
+        # Log any exceptions that occur
+        logging.error(f"An error occurred: {str(e)}", exc_info=True)
+        return {"error": str(e)}
 
 def respond_and_send_message(user_message: str, user: User):  
     # agent = RoutingAgent()  
     # response = agent.run(user_message, user.id)  
+    response = RoutingAgent(user_message, user.first_name)
+    print('got agent response: ', response)
+    send_whatsapp_message(user.phone, str(response), template=False)
+    # if user_message == "what time does the spa close?":
+    #     response = "The spa closes at 7:00 PM"
+    # elif user_message == "what time does the spa open?":
+    #     response = "The spa opens at 9:00 AM"
+    # elif user_message == "what time does talons close?":
+    #     response = "The restaurant closes at 3:30 PM"
+    # elif user_message == "what time does talons open?":
+    #     response = "The restaurant opens at 11:00 AM"
+    # elif user_message == "can I get towels up to my room ASAP?":
+    #     response = "Yes, we can send towels to your room right away."
+    # else:
+    #     response = "I'm sorry, I haven't been trained for that yet."
     # send_whatsapp_message(user.phone, response, template=False)
-    if user_message == "what time does the spa close?":
-        response = "The spa closes at 7:00 PM"
-    elif user_message == "what time does the spa open?":
-        response = "The spa opens at 9:00 AM"
-    elif user_message == "what time does talons close?":
-        response = "The restaurant closes at 3:30 PM"
-    elif user_message == "what time does talons open?":
-        response = "The restaurant opens at 11:00 AM"
-    elif user_message == "can I get towels up to my room ASAP?":
-        response = "Yes, we can send towels to your room right away."
-    else:
-        response = "I'm sorry, I haven't been trained for that yet."
-    send_whatsapp_message(user.phone, response, template=False)
