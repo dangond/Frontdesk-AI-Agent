@@ -118,6 +118,7 @@ class RoutingAgent:
 
                 except Exception as e:
                     # Log any errors that occur during LLM invocation
+                    end_time = time.time()
                     logger.error("Error during LLM invocation: %s", str(e), exc_info=True)
                     return "Sorry, there was an issue generating a response. Please try again later."
 
@@ -147,6 +148,7 @@ class RoutingAgent:
         """
         Prepares a JSON object for task requests based on the user message.
         """
+        # TODO: use alg for better department mapping based on message content
         # Basic example of department mapping based on keywords
         department_mapping = {
             "towels": "housekeeping",
@@ -155,6 +157,8 @@ class RoutingAgent:
             "food": "room service",
             "technical issue": "maintenance",
             "light": "maintenance",
+            "leak": "maintenance",
+            "heat": "maintenance",
             "air conditioning": "maintenance",
         }
 

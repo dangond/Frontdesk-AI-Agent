@@ -137,6 +137,10 @@ def send_whatsapp_message(to, message, template=False):
         return {"error": str(e)}
 
 def respond_and_send_message(user_message: str, user: User):
+    # if user is locked out, activate faceID:
+    if user_message.lower() == ("I am locked out of my room. Can I have a new key?").lower():
+        send_whatsapp_message(user.phone, "Sorry to hear that. Sure, please authenticate yourself using FaceID.")
+        return
     # Create an instance of RoutingAgent
     agent = RoutingAgent(user)
 
