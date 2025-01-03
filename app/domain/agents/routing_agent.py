@@ -7,6 +7,7 @@ from langchain_core.output_parsers import JsonOutputParser
 from langchain_community.chat_models import ChatOllama
 
 from app.schema import User
+import requests
 
 from dotenv import load_dotenv
 import os
@@ -36,6 +37,7 @@ class RoutingAgent:
         self.user = user
         self.room_number = 400 + len(user.last_name) #for now
         self.agent_executor = agent_executor
+        self.guest_name = user.first_name + " " + user.last_name
 
     def process_message(self, message):
         """
@@ -88,15 +90,15 @@ class RoutingAgent:
             if isinstance(response_json, dict) and "department" in response_json:
                 # Extract details from response_json
                 department = response_json["department"]
-                user_name = self.user.first_name
+                guest_name = self.guest_name
                 room_number = response_json.get("room_number", "N/A")
-                task_message = response_json.get("message", "No details provided")
+                request = response_json.get("request", "No details provided")
 
                 # Use LLM to generate a dynamic response
                 prompt = (
                     f"You are a polite and professional hotel owner named Karim at the Ritz-Carlton, Bachelor Gulch. "
-                    f"A guest named {user_name}, staying in room {room_number}, has submitted the following request: "
-                    f'"{task_message}". This request has been routed to the {department} department. '
+                    f"A guest named {guest_name}, staying in room {room_number}, has submitted the following request: "
+                    f'"{request}". This request has been routed to the {department} department. '
                     f"Write a response to the guest that acknowledges their request, assures them that the {department} team "
                     f"is working on it, and invites them to make additional requests if needed. Respond in a friendly and "
                     f"professional tone, and Please limit your response to 3 sentences or fewer."
@@ -175,18 +177,19 @@ class RoutingAgent:
         # Prepare task JSON
         task_json = {
             "department": department,
-            "user_first_name": self.user.first_name,
-            "user_last_name": self.user.last_name,
+            "guest_name": self.guest_name,
             "room_number": self.room_number,
-            "message": message
+            "request": message
         }
 
-        print("Task JSON prepared: ", task_json)
-        # TODO: Send the task to the admin portal
-        print("Task sent to admin portal")
+        print("Task JSON prepared: ", task_json)        
         # send guest a message letting them know their task has been received.
         reply_task_message = self.assure_guest(task_json)
-
+        print('sending the shiat to fabis portal...')
+        # uncomment to send to admin portal after its running locally
+        response = requests.post("http://127.0.0.1:5000/api/tasks", json=task_json)
+        print("Task sent to admin portal")
+        print('Response from sending task:', response)
         return reply_task_message + '\n\n You can track your request status at this link: https://www.google.com.'
     
 
