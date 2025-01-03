@@ -190,7 +190,9 @@ class RoutingAgent:
         response = requests.post("http://127.0.0.1:5000/api/tasks", json=task_json)
         print("Task sent to admin portal")
         print('Response from sending task:', response)
-        return reply_task_message + '\n\n You can track your request status at this link: https://www.google.com.'
+        task_data = response.json()
+        task_id = task_data.get('id')
+        return reply_task_message + f'\n\n You can track your request status at this link: http://127.0.0.1:5000/view-task/{task_id}.'
     
 
     
