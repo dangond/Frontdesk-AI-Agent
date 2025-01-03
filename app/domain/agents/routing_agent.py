@@ -153,15 +153,15 @@ class RoutingAgent:
         # TODO: use alg for better department mapping based on message content
         # Basic example of department mapping based on keywords
         department_mapping = {
-            "towels": "housekeeping",
-            "cleaning": "housekeeping",
-            "room service": "room service",
-            "food": "room service",
-            "technical issue": "maintenance",
-            "light": "maintenance",
-            "leak": "maintenance",
-            "heat": "maintenance",
-            "air conditioning": "maintenance",
+            "towels": "Housekeeping",
+            "cleaning": "Housekeeping",
+            "room service": "Room Service",
+            "food": "Room Service",
+            "technical issue": "Maintenance",
+            "light": "Maintenance",
+            "leak": "Maintenance",
+            "heat": "Maintenance",
+            "air conditioning": "Maintenance",
         }
 
         # Determine department from message
